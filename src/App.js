@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from "firebase/auth"
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, updateProfile } from "firebase/auth"
 import app from './firebase.init';
 
 const auth = getAuth(app)
@@ -67,7 +67,8 @@ function App() {
       createUserWithEmailAndPassword(auth, email, password)
         .then(result => {
           const user = result.user;
-          setSuccess('Register Success')
+          setSuccess('Register Success');
+          setUserName()
           console.log(user);
         })
         .catch(error => {
@@ -76,6 +77,20 @@ function App() {
     }
   }
 
+  const setUserName = () => {
+    updateProfile(auth.currentUser, {
+      displayName: name
+    })
+      .then(() => {
+        // Profile updated!
+
+      })
+      .then(error => {
+        setError(error.massage)
+      })
+  }
+
+
   return (
     <div>
       <div className="registration w-50 mx-auto mt-5">
@@ -83,15 +98,15 @@ function App() {
         <h2 className='text-primary'>Please Register</h2>
 
 
-        <Form onSubmit={handleFormSubmit}>
+        <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
 
-          <Form.Group className="mb-3" controlId="formBasicName">
+          {!registered && <Form.Group className="mb-3" controlId="formBasicName">
             <Form.Label>Name</Form.Label>
             <Form.Control onBlur={handleName} type="text" placeholder="Your name" />
             <Form.Text className="text-muted">
               Please provide your name.
             </Form.Text>
-          </Form.Group>
+          </Form.Group>}
 
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
@@ -108,6 +123,7 @@ function App() {
 
           {/* massage */}
           <p className='text-danger'>{error}</p>
+          <p className='text-success'>{success}</p>
 
           <Form.Group className="mb-3" controlId="formBasicCheckbox">
             <Form.Check onChange={handleRegisteredChange} type="checkbox" label="Already registered?" />
