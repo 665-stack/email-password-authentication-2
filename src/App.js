@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, updateProfile } from "firebase/auth"
 import app from './firebase.init';
 
 const auth = getAuth(app)
@@ -47,6 +47,7 @@ function App() {
     // regex for pass validation
     if (!/(?=.*?[#?!@$%^&*-])/.test(password)) {
       setError("Password should contain at least one special character")
+      setSuccess('')
       return;
     }
     setValidated(true)
@@ -61,6 +62,7 @@ function App() {
         })
         .catch(error => {
           setError(error.message)
+          setSuccess('')
         })
     }
     else {
@@ -68,11 +70,13 @@ function App() {
         .then(result => {
           const user = result.user;
           setSuccess('Register Success');
-          setUserName()
+          setUserName();
+          verifyEmail();
           console.log(user);
         })
         .catch(error => {
           setError(error.message)
+          setSuccess('')
         })
     }
   }
@@ -88,6 +92,12 @@ function App() {
       .then(error => {
         setError(error?.message)
       })
+  }
+  const verifyEmail = () => {
+    sendEmailVerification(auth.currentUser)
+      .then(() => {
+        console.log('Email verification sent!');
+      });
   }
 
 
@@ -119,15 +129,22 @@ function App() {
           <Form.Group className="mb-3" controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control onBlur={handlePassword} type="password" placeholder="Password" />
+            <Form.Control.Feedback type="invalid">
+              Please provide a valid password.
+            </Form.Control.Feedback>
           </Form.Group>
 
-          {/* massage */}
+          {/* message */}
           <p className='text-danger'>{error}</p>
           <p className='text-success'>{success}</p>
 
           <Form.Group className="mb-3" controlId="formBasicCheckbox">
             <Form.Check onChange={handleRegisteredChange} type="checkbox" label="Already registered?" />
           </Form.Group>
+
+          {registered && <Button onClick={handlePasswordReset} variant='link'>Forget Password?</Button>}
+
+          <br />
 
           <Button variant="primary" type="submit">
             {registered ? "Login" : "Register"}
