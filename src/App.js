@@ -60,7 +60,7 @@ function App() {
           console.log(user)
         })
         .catch(error => {
-          console.error(error);
+          setError(error.message)
         })
     }
     else {
@@ -72,7 +72,7 @@ function App() {
           console.log(user);
         })
         .catch(error => {
-          setError(error.massage)
+          setError(error.message)
         })
     }
   }
@@ -86,7 +86,7 @@ function App() {
 
       })
       .then(error => {
-        setError(error.massage)
+        setError(error?.message)
       })
   }
 
