@@ -4,12 +4,23 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from "firebase/auth"
+import app from './firebase.init';
+
+const auth = getAuth(app)
+
 function App() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('')
   const [registered, setRegistered] = useState(false)
+  const [validated, setValidated] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+
+
+
 
   const handleName = e => {
     setName(e.target.value);
@@ -24,13 +35,44 @@ function App() {
     setRegistered(e.target.checked)
   }
 
+  // submit button
   const handleFormSubmit = (e) => {
     e.preventDefault()
-    if (registered) {
 
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      return;
+    }
+    // regex for pass validation
+    if (!/(?=.*?[#?!@$%^&*-])/.test(password)) {
+      setError("Password should contain at least one special character")
+      return;
+    }
+    setValidated(true)
+    setError('')
+
+    if (registered) {
+      signInWithEmailAndPassword(auth, email, password)
+        .then(result => {
+          const user = result.user;
+          setSuccess("Login Success")
+          console.log(user)
+        })
+        .catch(error => {
+          console.error(error);
+        })
     }
     else {
-
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(result => {
+          const user = result.user;
+          setSuccess('Register Success')
+          console.log(user);
+        })
+        .catch(error => {
+          setError(error.massage)
+        })
     }
   }
 
@@ -64,12 +106,15 @@ function App() {
             <Form.Control onBlur={handlePassword} type="password" placeholder="Password" />
           </Form.Group>
 
+          {/* massage */}
+          <p className='text-danger'>{error}</p>
+
           <Form.Group className="mb-3" controlId="formBasicCheckbox">
             <Form.Check onChange={handleRegisteredChange} type="checkbox" label="Already registered?" />
           </Form.Group>
 
           <Button variant="primary" type="submit">
-            Submit
+            {registered ? "Login" : "Register"}
           </Button>
 
         </Form>
