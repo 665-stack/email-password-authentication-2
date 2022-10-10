@@ -99,7 +99,12 @@ function App() {
         console.log('Email verification sent!');
       });
   }
-
+  const handlePasswordReset = () => {
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        console.log("Password reset email sent!")
+      })
+  }
 
   return (
     <div>
@@ -112,7 +117,7 @@ function App() {
 
           {!registered && <Form.Group className="mb-3" controlId="formBasicName">
             <Form.Label>Name</Form.Label>
-            <Form.Control onBlur={handleName} type="text" placeholder="Your name" />
+            <Form.Control onBlur={handleName} type="text" placeholder="Your name" required />
             <Form.Text className="text-muted">
               Please provide your name.
             </Form.Text>
@@ -120,7 +125,7 @@ function App() {
 
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
-            <Form.Control onBlur={handleEmail} type="email" placeholder="Enter email" />
+            <Form.Control onBlur={handleEmail} type="email" placeholder="Enter email" required />
             <Form.Text className="text-muted">
               We'll never share your email with anyone else.
             </Form.Text>
@@ -128,7 +133,7 @@ function App() {
 
           <Form.Group className="mb-3" controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
-            <Form.Control onBlur={handlePassword} type="password" placeholder="Password" />
+            <Form.Control onBlur={handlePassword} type="password" placeholder="Password" required />
             <Form.Control.Feedback type="invalid">
               Please provide a valid password.
             </Form.Control.Feedback>
